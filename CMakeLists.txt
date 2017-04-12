@@ -23,7 +23,16 @@ set(INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/_install)
 set(PREFIX_DIR ${CMAKE_CURRENT_BINARY_DIR}/_prefix)
 set(PATCHES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/patches)
 set(INCLUDE_DIR ${INSTALL_DIR}/include)
-set(LIBRARY_DIR ${INSTALL_DIR}/lib ${INSTALL_DIR}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
+set(LIBRARY_DIR ${INSTALL_DIR}/lib)
+
+if(CMAKE_LIBRARY_ARCHITECTURE)
+	set(LIBDIR_ARCH "${INSTALL_DIR}/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+else() # not debian, rely on CMAKE_SIZEOF_VOID_P:
+	if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+          set(LIBDIR_ARCH "${INSTALL_DIR}/lib64")
+        endif()
+endif()
+
 set(TEST_RESULTS_DIR ${CMAKE_CURRENT_BINARY_DIR}/test_results)
 file(MAKE_DIRECTORY ${TEST_RESULTS_DIR})
 
@@ -114,7 +123,7 @@ add_dependencies(libwrp-c wrp-c)
 endif ()
 
 add_subdirectory(src)
-link_directories ( ${LIBRARY_DIR})
+link_directories ( ${LIBRARY_DIR} ${LIBDIR_ARCH})
 
 add_definitions(-std=c99)
 
